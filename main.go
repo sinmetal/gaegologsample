@@ -34,6 +34,7 @@ func main() {
 	}
 
 	http.HandleFunc("/", index)
+	http.HandleFunc("/nolog", nolog)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -67,16 +68,27 @@ func index(w http.ResponseWriter, r *http.Request) {
 		Payload:  t,
 		Trace:    trace,
 		Resource: monRes,
+		Severity: logging.Info,
 	})
 	fmt.Fprintf(w, "Logged: %v\n", t)
-	log.Printf("Logged: %v\n", t)
+	log.Printf("log.Printf Logged: %v\n", t)
+	otherFunc()
 
 	t = fmt.Sprintf("[request #%d] A second entry here!", requestCount)
 	lg.Log(logging.Entry{
 		Payload:  t,
 		Trace:    trace,
 		Resource: monRes,
+		Severity: logging.Warning,
 	})
 	fmt.Fprintf(w, "Logged: %v\n", t)
-	log.Printf("Logged: %v\n", t)
+	log.Printf("log.Printf Logged: %v\n", t)
+}
+
+func nolog(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "No Logged: %v\n")
+}
+
+func otherFunc() {
+	log.Printf("otherFunc output log")
 }
